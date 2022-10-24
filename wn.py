@@ -67,14 +67,11 @@ def wiener1(input, PSF, eps, K=0.01):  # 未知信噪比的维纳滤波，使用近似方式
     return result
 
 def wiener2(input, PSF, eps,NCORR,ICORR):  # 未知信噪比的维纳滤波，利用未退化图像以及噪声图自相关函数功率谱来求k
-    rx1 = np.array(NCORR) / 128
-    pxr1 = fft(rx1, 255)
-    pxr1 = abs(pxr1)  # 执行后pxr是信号的功率谱
-    rx2 = np.array(NCORR) / 128
-    pxr2 = fft(rx2, 255)
-    pxr2 = abs(pxr2)  # 执行后pxr是信号的功率谱
-    K = (NCORR/ICORR)*0.01
+    prx1 = np.abs(np.array(np.fft.fft2(NCORR)))**2
+    prx2 = np.abs(np.array(np.fft.fft2(ICORR)))**2
+    K = prx1/prx2*16876
     # print(K)
+
     input_fft = np.fft.fft2(input)
     PSF_fft = np.fft.fft2(PSF) + eps
     PSF_fft_1 = (((np.abs(PSF_fft) ** 2) / (np.abs(PSF_fft) ** 2 + K))/ PSF_fft) * input_fft
@@ -97,6 +94,7 @@ if __name__ == "__main__":
     # 添加噪声,standard_normal产生随机的函数
     blurred_noisy = blurred + 0.1 * blurred.std() * \
                     np.random.standard_normal(blurred.shape)
+    noisy = 0.1 * blurred.std() * np.random.standard_normal(blurred.shape)
     # numpy.random.normal(loc=0.0, scale=1.0, size=None)
     plt.figure(figsize=(8, 6))
     plt.subplot(2,3,1)
@@ -116,7 +114,7 @@ if __name__ == "__main__":
 
     #获取未退化图以及噪声图的自相关函数
     ICORR = getAC(pic)
-    NCORR = getAC(blurred_noisy)
+    NCORR = getAC(noisy)
     result = wiener2(blurred_noisy, PSF, eps, NCORR, ICORR)
     plt.subplot(2,3,4)
     plt.axis("off"), plt.title("wiener deblurred(compute k)"), plt.imshow(result)

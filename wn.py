@@ -70,6 +70,7 @@ def wiener2(input, PSF, eps,NCORR,ICORR):  # Î´ÖªĞÅÔë±ÈµÄÎ¬ÄÉÂË²¨£¬ÀûÓÃÎ´ÍË»¯Í¼Ï
     prx1 = np.abs(np.array(np.fft.fft2(NCORR)))**2
     prx2 = np.abs(np.array(np.fft.fft2(ICORR)))**2
     K = prx1/prx2*16876
+    # K = prx1 / prx2*1000
     # print(K)
 
     input_fft = np.fft.fft2(input)
@@ -80,7 +81,7 @@ def wiener2(input, PSF, eps,NCORR,ICORR):  # Î´ÖªĞÅÔë±ÈµÄÎ¬ÄÉÂË²¨£¬ÀûÓÃÎ´ÍË»¯Í¼Ï
     return result
 
 if __name__ == "__main__":
-    image = cv2.imread(r'sheep.jpg')
+    image = cv2.imread(r'cat.jpg')
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     eps = 1e-3
